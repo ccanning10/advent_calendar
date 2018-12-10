@@ -87,38 +87,45 @@ class CircleBoard(object):
         return ', '.join(nodes) if nodes else ''
 
 
+def execute(num_players, last_marble_points, part):
+
+    scores = defaultdict(int)
+    next_marble_number = 0
+    current_score = 0
+    circle = CircleBoard()
+    players = cycle(iter(range(1, num_players+1)))
+    current_player = 1
+    top_score = 0
+
+    print('Part {}'.format(part))
+    print('    Number of players: {}'.format(num_players))
+    print('    Number of final marble points: {}'.format(last_marble_points))
+    print('    Starting game...')
+    while (next_marble_number != last_marble_points):
+        current_score = 0
+        next_marble_number += 1
+        current_player = next(players)
+        current_marble = circle.get_current_marble()
+
+        if next_marble_number % 23 == 0:
+            current_score = next_marble_number
+            removed_number = circle.remove_marble(-7)
+            current_score += removed_number
+        else:
+            circle.place_marble(next_marble_number)
+
+        scores[current_player] += current_score
+        top_score = scores[current_player] if scores[current_player] > top_score else top_score
+
+    print('    Ending game...')
+    print('    Top Score: {}'.format(top_score))
+
+
 input_values = '448 players; last marble is worth 71628 points' # 394486
 match = re.search('([0-9]+)(\splayers;\slast\smarble\sis\sworth\s)([0-9]+)', input_values)
 
 num_players = int(match.group(1))
 last_marble_points = int(match.group(3))
 
-scores = defaultdict(int)
-next_marble_number = 0
-current_score = 0
-circle = CircleBoard()
-players = cycle(iter(range(1, num_players+1)))
-current_player = 1
-top_score = 0
-
-print('Number of players: {}'.format(num_players))
-print('Number of final marble points: {}'.format(last_marble_points))
-print('Starting game...')
-while (next_marble_number != last_marble_points):
-    current_score = 0
-    next_marble_number += 1
-    current_player = next(players)
-    current_marble = circle.get_current_marble()
-
-    if next_marble_number % 23 == 0:
-        current_score = next_marble_number
-        removed_number = circle.remove_marble(-7)
-        current_score += removed_number
-    else:
-        circle.place_marble(next_marble_number)
-
-    scores[current_player] += current_score
-    top_score = scores[current_player] if scores[current_player] > top_score else top_score
-
-print('Ending game...')
-print('Top Score: {}'.format(top_score))
+execute(num_players, last_marble_points, 1)
+execute(num_players, last_marble_points*100, 2)
